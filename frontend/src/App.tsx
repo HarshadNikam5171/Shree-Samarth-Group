@@ -3,7 +3,48 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import Navbar from "./components/Navbar";
 import { useStore } from "./store/useStore";
-import API from "./services/api"; // फिक्स केलेली इम्पोर्ट लाईन
+import  API from "./services/api";
+
+// डार्क/लाईट आयकॉन्ससाठी सोपे SVG किंवा direct Lucide-react ऐवजी इनलाईन आयकॉन्स वापरले आहेत जेणेकरून लायब्ररी नसली तरी एरर येणार नाही.
+const SunIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2" />
+    <path d="M12 20v2" />
+    <path d="m4.93 4.93 1.41 1.41" />
+    <path d="m17.66 17.66 1.41 1.41" />
+    <path d="M2 12h2" />
+    <path d="M20 12h2" />
+    <path d="m6.34 17.66-1.41 1.41" />
+    <path d="m19.07 4.93-1.41 1.41" />
+  </svg>
+);
+
+const MoonIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+  </svg>
+);
 
 // १. TypeScript Interfaces
 interface Project {
@@ -26,7 +67,7 @@ interface CareerFormInputs {
   resume: FileList;
 }
 
-// २. ब्रोशरनुसार अचूक प्रीमियम डेटा (Real Brochure Details)
+// २. ब्रोशरनुसार अचूक प्रीमियम डेटा
 const PREMIUM_PROJECTS_DATA: Project[] = [
   {
     _id: "p1",
@@ -110,6 +151,9 @@ const App: React.FC = () => {
   const { language } = useStore();
   const [videoLoaded, setVideoLoaded] = useState(false);
 
+  // थीम स्टेट: default 'dark' ठेवली आहे जसा आपला ओरिजिनल डिझाईन लुक होता
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+
   const [projects, setProjects] = useState<Project[]>(PREMIUM_PROJECTS_DATA);
   const [filter, setFilter] = useState<string>("All");
   const [loadingProjects, setLoadingProjects] = useState(false);
@@ -122,6 +166,20 @@ const App: React.FC = () => {
   } = useForm<CareerFormInputs>();
   const [submittingCareer, setSubmittingCareer] = useState(false);
   const [careerSuccess, setCareerSuccess] = useState("");
+
+  // LocalStorage मधून थीम रीस्टोर करणे
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "light") {
+      setIsDarkMode(false);
+    }
+  }, []);
+
+  // थीम बदलल्यावर ती सेव्ह करणे
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    localStorage.setItem("theme", !isDarkMode ? "dark" : "light");
+  };
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -179,8 +237,29 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="bg-neutral-950 text-white min-h-screen font-sans selection:bg-amber-500 selection:text-black">
+    <div
+      className={`min-h-screen font-sans selection:bg-amber-500 selection:text-black transition-colors duration-500 ${
+        isDarkMode
+          ? "bg-neutral-950 text-white"
+          : "bg-neutral-50 text-neutral-900"
+      }`}
+    >
       <Navbar />
+
+      {/* ==================== FLOATING DARK / LIGHT MODE TOGGLE BUTTON ==================== */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={toggleTheme}
+          className={`p-3.5 rounded-full shadow-2xl backdrop-blur-md flex items-center justify-center border transition-all duration-300 transform hover:scale-110 active:scale-95 ${
+            isDarkMode
+              ? "bg-neutral-900/90 border-neutral-800 text-amber-500 hover:text-amber-400"
+              : "bg-white/90 border-neutral-200 text-amber-600 hover:text-amber-700 shadow-neutral-400/50"
+          }`}
+          title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        >
+          {isDarkMode ? <SunIcon /> : <MoonIcon />}
+        </button>
+      </div>
 
       {/* ==================== 1. HERO SECTION WITH LOGO INTEGRATION ==================== */}
       <section
@@ -217,7 +296,7 @@ const App: React.FC = () => {
             className="w-32 h-32 md:w-40 md:h-40 mb-6 bg-white/5 backdrop-blur-md rounded-full p-2 border border-amber-500/20 shadow-2xl flex items-center justify-center"
           >
             <img
-              src="E:"
+              src="http://googleusercontent.com/image_collection/image_retrieval/13742465229652195631"
               alt="Shree Samarth Group Official Logo"
               className="w-full h-full object-contain filter drop-shadow-[0_0_15px_rgba(245,158,11,0.4)]"
             />
@@ -231,7 +310,7 @@ const App: React.FC = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight"
+            className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight text-white"
           >
             {language === "EN"
               ? "Unity • Integrity • Progress"
@@ -253,7 +332,7 @@ const App: React.FC = () => {
             </a>
             <a
               href="#contact"
-              className="px-8 py-3.5 border border-white/20 rounded backdrop-blur-sm uppercase tracking-wider text-xs hover:bg-white/10 transition duration-300"
+              className="px-8 py-3.5 border border-white/20 rounded backdrop-blur-sm uppercase tracking-wider text-xs text-white hover:bg-white/10 transition duration-300"
             >
               {language === "EN" ? "Contact Office" : "संपर्क करा"}
             </a>
@@ -264,7 +343,7 @@ const App: React.FC = () => {
       {/* ==================== 2. ABOUT US SECTION ==================== */}
       <section
         id="about"
-        className="py-32 max-w-7xl mx-auto px-6 md:px-12 border-b border-neutral-900"
+        className={`py-32 max-w-7xl mx-auto px-6 md:px-12 border-b ${isDarkMode ? "border-neutral-900" : "border-neutral-200"}`}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <div>
@@ -276,7 +355,9 @@ const App: React.FC = () => {
                 ? "The Quality People Trust"
                 : "गुणवत्ता आणि विश्वासाची २५ वर्षे"}
             </h2>
-            <p className="text-neutral-400 mt-6 leading-relaxed text-base">
+            <p
+              className={`mt-6 leading-relaxed text-base ${isDarkMode ? "text-neutral-400" : "text-neutral-600"}`}
+            >
               {language === "EN"
                 ? "Shree Samarth Group builds structural excellence with absolute integrity. Focusing on meticulous craftsmanship and strategic urban planning, we provide premium residential landmarks in Pune and Kolhapur."
                 : "श्री समर्थ ग्रुप बांधकाम क्षेत्रातील सचोटी आणि गुणवत्तेचे प्रतीक आहे. प्रत्येक प्रकल्पामध्ये अचूक इंजिनिअरिंग आणि ग्राहकांच्या सुखाचा विचार करूनच आम्ही पुण्यात आणि कोल्हापुरात दर्जेदार वास्तूंची उभारणी करत आहोत."}
@@ -290,31 +371,40 @@ const App: React.FC = () => {
               ].map((value, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 border border-neutral-900/60 p-4 bg-neutral-900/10 rounded"
+                  className={`flex items-center gap-3 border p-4 rounded ${
+                    isDarkMode
+                      ? "border-neutral-900/60 bg-neutral-900/10 text-gray-200"
+                      : "border-neutral-200 bg-white shadow-sm text-neutral-800"
+                  }`}
                 >
                   <span className="text-amber-500 font-bold">✓</span>{" "}
-                  <span className="text-sm font-semibold text-gray-200">
-                    {value}
-                  </span>
+                  <span className="text-sm font-semibold">{value}</span>
                 </div>
               ))}
             </div>
           </div>
-          <div className="h-[400px] rounded-lg border border-neutral-900 shadow-2xl overflow-hidden relative group">
+          <div
+            className={`h-[400px] rounded-lg border shadow-2xl overflow-hidden relative group ${isDarkMode ? "border-neutral-900" : "border-neutral-200"}`}
+          >
             <img
               src="http://googleusercontent.com/image_collection/image_retrieval/13742465229652195631"
               alt="Corporate Branding Logo Context"
               className="w-full h-full object-cover filter brightness-90 group-hover:scale-105 transition duration-700"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent opacity-80"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-40"></div>
           </div>
         </div>
       </section>
 
-      {/* ==================== 3. PROJECTS SECTION (BROCHURE ACCURATE GRID) ==================== */}
-      <section id="projects" className="py-32 bg-neutral-950 px-6 md:px-12">
+      {/* ==================== 3. PROJECTS SECTION (THEME ADAPTIVE GRID) ==================== */}
+      <section
+        id="projects"
+        className={`py-32 px-6 md:px-12 ${isDarkMode ? "bg-neutral-950" : "bg-neutral-100/50"}`}
+      >
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-neutral-900 pb-8">
+          <div
+            className={`flex flex-col md:flex-row md:items-end justify-between border-b pb-8 ${isDarkMode ? "border-neutral-900" : "border-neutral-200"}`}
+          >
             <div>
               <span className="text-amber-500 uppercase tracking-widest text-xs font-bold font-mono">
                 Landmarks
@@ -334,7 +424,9 @@ const App: React.FC = () => {
                   className={`px-5 py-2.5 rounded text-xs font-bold tracking-widest transition duration-300 ${
                     filter === status
                       ? "bg-amber-500 text-neutral-950 shadow-lg font-black"
-                      : "bg-neutral-900/50 text-gray-400 hover:text-white"
+                      : isDarkMode
+                        ? "bg-neutral-900/50 text-gray-400 hover:text-white"
+                        : "bg-white text-neutral-500 hover:text-neutral-900 border border-neutral-200 shadow-sm"
                   }`}
                 >
                   {status.toUpperCase()}
@@ -361,7 +453,11 @@ const App: React.FC = () => {
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.4 }}
                     key={project._id}
-                    className="bg-neutral-900/10 border border-neutral-900 rounded-lg overflow-hidden group hover:border-amber-500/20 transition duration-300 flex flex-col justify-between"
+                    className={`border rounded-lg overflow-hidden group transition duration-300 flex flex-col justify-between ${
+                      isDarkMode
+                        ? "bg-neutral-900/10 border-neutral-900 hover:border-amber-500/20"
+                        : "bg-white border-neutral-200 hover:border-amber-500/40 shadow-sm"
+                    }`}
                   >
                     <div>
                       <div className="h-[380px] overflow-hidden relative bg-neutral-900">
@@ -387,25 +483,37 @@ const App: React.FC = () => {
                         <span className="text-amber-500/80 text-xs font-mono font-medium block mb-1 uppercase tracking-wider">
                           {project.category}
                         </span>
-                        <h3 className="text-2xl font-bold tracking-wide text-white group-hover:text-amber-500 transition duration-300">
+                        <h3
+                          className={`text-2xl font-bold tracking-wide group-hover:text-amber-500 transition duration-300 ${isDarkMode ? "text-white" : "text-neutral-900"}`}
+                        >
                           {project.title}
                         </h3>
-                        <p className="text-gray-400 text-sm mt-2 flex items-center gap-2">
+                        <p
+                          className={`text-sm mt-2 flex items-center gap-2 ${isDarkMode ? "text-gray-400" : "text-neutral-600"}`}
+                        >
                           <span>📍</span> {project.location}
                         </p>
 
                         {project.sqft && (
-                          <p className="text-neutral-500 text-xs font-mono mt-2">
+                          <p
+                            className={`text-xs font-mono mt-2 ${isDarkMode ? "text-neutral-500" : "text-neutral-400"}`}
+                          >
                             📐 Salable Area: {project.sqft}
                           </p>
                         )}
 
                         {project.amenities && (
-                          <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-neutral-900/60">
+                          <div
+                            className={`flex flex-wrap gap-2 mt-4 pt-4 border-t ${isDarkMode ? "border-neutral-900/60" : "border-neutral-100"}`}
+                          >
                             {project.amenities.map((amenity, index) => (
                               <span
                                 key={index}
-                                className="text-[10px] font-medium bg-neutral-900 border border-neutral-800 text-neutral-400 px-2 py-1 rounded"
+                                className={`text-[10px] font-medium px-2 py-1 rounded border ${
+                                  isDarkMode
+                                    ? "bg-neutral-900 border-neutral-800 text-neutral-400"
+                                    : "bg-neutral-50 border-neutral-200 text-neutral-600"
+                                }`}
                               >
                                 • {amenity}
                               </span>
@@ -425,7 +533,7 @@ const App: React.FC = () => {
       {/* ==================== 4. CAREERS SECTION ==================== */}
       <section
         id="careers"
-        className="py-32 max-w-4xl mx-auto px-6 border-t border-neutral-900"
+        className={`py-32 max-w-4xl mx-auto px-6 border-t ${isDarkMode ? "border-neutral-900" : "border-neutral-200"}`}
       >
         <div className="text-center mb-12">
           <span className="text-amber-500 uppercase tracking-widest text-xs font-bold font-mono">
@@ -444,7 +552,7 @@ const App: React.FC = () => {
 
         <form
           onSubmit={handleSubmit(onCareerSubmit)}
-          className="space-y-6 bg-neutral-900/10 p-8 border border-neutral-900 rounded-lg"
+          className={`space-y-6 p-8 border rounded-lg ${isDarkMode ? "bg-neutral-900/10 border-neutral-900" : "bg-white border-neutral-200 shadow-sm"}`}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -454,7 +562,7 @@ const App: React.FC = () => {
               <input
                 type="text"
                 {...register("name", { required: true })}
-                className="w-full bg-neutral-950 border border-neutral-900 rounded p-3 focus:border-amber-500 outline-none transition text-sm text-white"
+                className={`w-full border rounded p-3 focus:border-amber-500 outline-none transition text-sm ${isDarkMode ? "bg-neutral-950 border-neutral-900 text-white" : "bg-neutral-50 border-neutral-200 text-neutral-900"}`}
               />
             </div>
             <div>
@@ -464,7 +572,7 @@ const App: React.FC = () => {
               <input
                 type="email"
                 {...register("email", { required: true })}
-                className="w-full bg-neutral-950 border border-neutral-900 rounded p-3 focus:border-amber-500 outline-none transition text-sm text-white"
+                className={`w-full border rounded p-3 focus:border-amber-500 outline-none transition text-sm ${isDarkMode ? "bg-neutral-950 border-neutral-900 text-white" : "bg-neutral-50 border-neutral-200 text-neutral-900"}`}
               />
             </div>
           </div>
@@ -476,7 +584,7 @@ const App: React.FC = () => {
               <input
                 type="tel"
                 {...register("phone", { required: true })}
-                className="w-full bg-neutral-950 border border-neutral-900 rounded p-3 focus:border-amber-500 outline-none transition text-sm text-white"
+                className={`w-full border rounded p-3 focus:border-amber-500 outline-none transition text-sm ${isDarkMode ? "bg-neutral-950 border-neutral-900 text-white" : "bg-neutral-50 border-neutral-200 text-neutral-900"}`}
               />
             </div>
             <div>
@@ -487,7 +595,7 @@ const App: React.FC = () => {
                 type="file"
                 accept=".pdf"
                 {...register("resume", { required: true })}
-                className="w-full bg-neutral-950 border border-neutral-900 text-gray-400 file:bg-neutral-800 file:border-0 file:text-white file:px-4 file:py-2 file:mr-4 file:text-xs file:rounded cursor-pointer p-1.5 text-xs"
+                className={`w-full border text-xs cursor-pointer p-1.5 ${isDarkMode ? "bg-neutral-950 border-neutral-900 text-gray-400 file:bg-neutral-800 file:text-white file:border-0 file:px-4 file:py-2 file:mr-4 file:text-xs file:rounded" : "bg-neutral-50 border-neutral-200 text-neutral-600 file:bg-neutral-200 file:text-neutral-800 file:border-0 file:px-4 file:py-2 file:mr-4 file:text-xs file:rounded"}`}
               />
             </div>
           </div>
@@ -506,7 +614,7 @@ const App: React.FC = () => {
       {/* ==================== 5. CONTACT US SECTION ==================== */}
       <section
         id="contact"
-        className="py-32 bg-neutral-900/10 border-t border-neutral-900 px-6 md:px-12"
+        className={`py-32 border-t px-6 md:px-12 ${isDarkMode ? "bg-neutral-900/10 border-neutral-900" : "bg-neutral-100/30 border-neutral-200"}`}
       >
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
           <div>
@@ -516,7 +624,9 @@ const App: React.FC = () => {
             <h2 className="text-3xl md:text-5xl font-bold mt-2 tracking-tight">
               {language === "EN" ? "Get In Touch" : "मुख्य कार्यालय संपर्क"}
             </h2>
-            <div className="mt-8 space-y-6 text-gray-400 text-base">
+            <div
+              className={`mt-8 space-y-6 text-base ${isDarkMode ? "text-gray-400" : "text-neutral-600"}`}
+            >
               <p className="flex items-start gap-3">
                 <span className="text-amber-500">📍</span>
                 <span>
@@ -544,11 +654,13 @@ const App: React.FC = () => {
             </a>
           </div>
 
-          <div className="h-80 md:h-full bg-neutral-950 rounded border border-neutral-900 overflow-hidden shadow-xl">
+          <div
+            className={`h-80 md:h-full rounded border overflow-hidden shadow-xl ${isDarkMode ? "bg-neutral-950 border-neutral-900" : "bg-white border-neutral-200"}`}
+          >
             <iframe
               title="Office Location Map"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d122283.79427329243!2d74.16823335!3d16.70614115!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc1000cdec07a29%3A0xe28e158dfb688657!2sKolhapur%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1710000000000!5m2!1sen!2sin"
-              className="w-full h-full border-0 filter invert contrast-125 brightness-75 grayscale"
+              className={`w-full h-full border-0 ${isDarkMode ? "filter invert contrast-125 brightness-75 grayscale" : ""}`}
               allowFullScreen
               loading="lazy"
             />
@@ -557,7 +669,9 @@ const App: React.FC = () => {
       </section>
 
       {/* ==================== FOOTER ==================== */}
-      <footer className="py-12 text-center text-xs text-gray-600 border-t border-neutral-900 bg-neutral-950">
+      <footer
+        className={`py-12 text-center text-xs border-t ${isDarkMode ? "text-gray-600 border-neutral-900 bg-neutral-950" : "text-neutral-500 border-neutral-200 bg-white"}`}
+      >
         © 2026 Shree Samarth Group. All Rights Reserved. Unity • Integrity •
         Progress.
       </footer>
