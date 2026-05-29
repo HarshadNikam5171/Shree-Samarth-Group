@@ -53,6 +53,7 @@ export default function Header({
     { id: 'about', label: 'About & Directors' },
     { id: 'projects', label: 'Projects' },
     { id: 'services', label: 'Services' },
+    { id: 'careers', label: 'Careers' },
     { id: 'contact', label: 'Contact' }
   ]
 
@@ -61,6 +62,7 @@ export default function Header({
     if (interactiveMode) {
       setInteractiveMode(false)
     }
+
     const element = document.getElementById(`${id}-section`)
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' })

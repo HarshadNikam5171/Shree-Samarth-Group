@@ -7,6 +7,7 @@ import ProjectsSection from './components/ProjectsSection'
 import ServicesSection from './components/ServicesSection'
 import ContactSection from './components/ContactSection'
 import FallbackUI from './components/FallbackUI'
+import CareersSection from './components/CareersSection'
 import './App.css'
 
 function App() {
@@ -122,14 +123,16 @@ function App() {
       setScrollPercent(clampedPercent)
 
       // Section mapping based on scroll levels
-      if (clampedPercent < 0.15) {
+      if (clampedPercent < 0.12) {
         setActiveSection('home')
-      } else if (clampedPercent < 0.45) {
+      } else if (clampedPercent < 0.35) {
         setActiveSection('about')
-      } else if (clampedPercent < 0.72) {
+      } else if (clampedPercent < 0.58) {
         setActiveSection('projects')
-      } else if (clampedPercent < 0.90) {
+      } else if (clampedPercent < 0.76) {
         setActiveSection('services')
+      } else if (clampedPercent < 0.89) {
+        setActiveSection('careers')
       } else {
         setActiveSection('contact')
       }
@@ -191,7 +194,7 @@ function App() {
         {webglSupported ? (
           <ThreeCanvas
             scrollPercent={scrollPercent}
-            activeFilter={activeFilter}
+            activeFilter={['completed', 'ongoing', 'upcoming'].includes(activeFilter) ? activeFilter : 'all'}
             interactiveMode={interactiveMode}
             theme={theme}
           />
@@ -264,6 +267,9 @@ function App() {
 
         {/* Maintenance platforms / Ecological Services */}
         <ServicesSection />
+
+        {/* Unified Careers Portfolio scroll section */}
+        <CareersSection />
 
         {/* Contact and vacancies Base Anchor */}
         <ContactSection />

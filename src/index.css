@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* CSS Design System for Shree Samarth Group - Deep Space & Electric Blue */
 
 :root {
@@ -1204,4 +1206,9 @@ footer {
   .project-drawer {
     width: 100%;
   }
+}
+
+/* Custom Super-Premium Utilities for Shree Samarth Group */
+.text-shadow-glow {
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.6), 0 0 20px rgba(0, 240, 255, 0.2);
 }
